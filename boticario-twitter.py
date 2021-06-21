@@ -7,7 +7,7 @@
 get_ipython().run_line_magic('pip', 'install tweepy')
 
 
-# In[ ]:
+#Import de bibliotecas necessarias para autenticação e leitura de itens do twitter
 
 
 import tweepy
@@ -18,28 +18,27 @@ from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
 
 
-# In[ ]:
+# Criação de autenticação no twitter
 
-
-consumer_key = 'sj0l73D6zc6DWi4hg1RStup6T'
-consumer_secret = 'OUv8tbn2On6HWTKXNWxdkyRkH6fEvSyVRNh2eHt1jOhOug9MrH'
-access_token = '1115032444682502144-lB9B5XcOjWhhRDcET2lvrqayudPsnM'
-access_token_secret = 'myKZ6gWeYEi0p86i9lYYphjq7iRteT4AK665VsglEmtlu'
+#Itens gerados no dev team twitter omitidos do código
+consumer_key = ''
+consumer_secret = ''
+access_token = ''
+access_token_secret = ''
 
 autenticator = tweepy.OAuthHandler(consumer_key, consumer_secret)
 autenticator.set_access_token(access_token, access_token_secret)
 api = tweepy.API(autenticator)
 
 
-# In[ ]:
-
+# Busca de tweets com palavras como Boticário e hidratante ou hidratantes
 
 query= 'Boticário Hidratantes OR hidratante'
 
 meus_tweets = api.search(q=query, tweet_mode = 'extended', lang='pt', count=10000)
 
 
-# In[ ]:
+# criação de um data frame pandas para gerar e visualizar arquivo com conteúdo solicitado
 
 
 import pandas as pd
@@ -58,7 +57,7 @@ df_s3 = pd.DataFrame(dados)
 display(df_s3)
 
 
-# In[ ]:
+# Criação de sparkcontext e inicialização de spark para execução de import de CSV gerado acima com conteúdo pesquisado no twitter.
 
 
 sc = SparkContext('local')
@@ -66,15 +65,11 @@ spark = SparkSession(sc)
 print(type(spark))
 
 
-# In[ ]:
+# Import de CSV para bucket S3
 
 
 from io import StringIO
 import boto3
-
-
-# In[ ]:
-
 
 df = df_s3
 
@@ -84,8 +79,6 @@ df.to_csv(csv_buffer, sep = ';', header=False)
 s3_resource = boto3.resource('s3')
 s3_resource.Object(bucket, 'df_tweet.csv').put(Body=csv_buffer.getvalue())
 
-
-# In[ ]:
 
 
 
